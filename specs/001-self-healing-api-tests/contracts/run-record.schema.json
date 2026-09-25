@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Healer run record",
+  "type": "object",
+  "required": ["run_id", "started_at", "finished_at", "baseline", "current", "changes",
+               "initial_results", "classification", "attempts", "actions", "outcome",
+               "exit_code", "notes"],
+  "properties": {
+    "run_id": {"type": "string"},
+    "started_at": {"type": "string", "format": "date-time"},
+    "finished_at": {"type": "string", "format": "date-time"},
+    "baseline": {"$ref": "#/$defs/spec"},
+    "current": {"oneOf": [{"$ref": "#/$defs/spec"}, {"type": "null"}]},
+    "changes": {"type": "array", "items": {"$ref": "#/$defs/change"}},
+    "initial_results": {"type": "array", "items": {"$ref": "#/$defs/result"}},
+    "classification": {"enum": ["pass", "spec_change", "regression", "environment_failure",
+                                "unrepairable", "unknown"]},
+    "attempts": {"type": "array", "items": {"$ref": "#/$defs/attempt"}},
+    "actions": {"type": "array", "items": {"type": "string"}},
+    "outcome": {"enum": ["passed", "repaired", "failed"]},
+    "exit_code": {"enum": [0, 1]},
+    "notes": {"type": "array", "items": {"type": "string"}}
+  },
+  "$defs": {
+    "spec": {
+      "type": "object",
+      "required": ["version", "hash", "source"],
+      "properties": {"version": {"type": "string"}, "hash": {"type": "string"},
+                     "source": {"type": "string"}}
+    },
+    "change": {
+      "type": "object",
+      "required": ["id", "kind", "method", "path", "field", "old", "new", "required",
+                   "example", "breaking"],
+      "properties": {
+        "id": {"type": "string"},
+        "kind": {"enum": ["path_renamed", "endpoint_removed", "endpoint_added", "status_changed",
+                          "response_field_renamed", "response_field_removed",
+                          "response_field_added", "request_field_renamed",
+                          "request_field_removed", "request_field_added"]},
+        "method": {"type": ["string", "null"]},
+        "path": {"type": "string"},
+        "field": {"type": ["string", "null"]},
+        "old": {"type": ["string", "integer", "null"]},
+        "new": {"type": ["string", "integer", "null"]},
+        "required": {"type": "boolean"},
+        "example": {},
+        "breaking": {"type": "boolean"}
+      }
+    },
+    "result": {
+      "type": "object",
+      "required": ["nodeid", "file", "name", "outcome", "message"],
+      "properties": {"nodeid": {"type": "string"}, "file": {"type": "string"},
+                     "name": {"type": "string"},
+                     "outcome": {"enum": ["passed", "failed", "error", "skipped"]},
+                     "message": {"type": "string"}}
+    },
+    "repair": {
+      "type": "object",
+      "required": ["change_id", "file", "line", "test", "before", "after", "description"],
+      "properties": {"change_id": {"type": "string"}, "file": {"type": "string"},
+                     "line": {"type": "integer"}, "test": {"type": ["string", "null"]},
+                     "before": {"type": "string"}, "after": {"type": "string"},
+                     "description": {"type": "string"}}
+    },
+    "attempt": {
+      "type": "object",
+      "required": ["number", "repairs", "guard_violations", "results", "passed"],
+      "properties": {"number": {"type": "integer"},
+                     "repairs": {"type": "array", "items": {"$ref": "#/$defs/repair"}},
+                     "guard_violations": {"type": "array", "items": {"type": "string"}},
+                     "results": {"type": "array", "items": {"$ref": "#/$defs/result"}},
+                     "passed": {"type": "boolean"}}
+    }
+  }
+}

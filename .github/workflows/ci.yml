@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --locked
+      - name: Lint
+        run: |
+          uv run ruff check .
+          uv run ruff format --check .
+      - name: Type check
+        run: uv run mypy
+      - name: System tests
+        run: uv run pytest
+      - name: API suite against the demo API mode matching the baseline
+        run: |
+          # Stop the server afterwards: a running `uv run` blocks setup-uv's cache cleanup.
+          uv run demo-api --match-baseline api-spec/openapi.json --port 8000 &
+          API_PID=$!
+          trap 'kill "$API_PID"; wait "$API_PID" || true' EXIT
+          for _ in $(seq 50); do
+            curl -sf http://127.0.0.1:8000/openapi.json > /dev/null && break
+            sleep 0.2
+          done
+          API_BASE_URL=http://127.0.0.1:8000 uv run pytest tests/api
