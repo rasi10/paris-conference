@@ -1,0 +1,48 @@
+[project]
+name = "self-healing-api-tests"
+version = "0.1.0"
+description = "Keeps an API test suite in sync with the API's OpenAPI specification"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi>=0.110",
+    "httpx>=0.27",
+    "pytest>=8.0",
+    "uvicorn>=0.29",
+]
+
+[project.scripts]
+healer = "healer.cli:main"
+demo-api = "demo_api.app:main"
+
+[dependency-groups]
+dev = [
+    "mypy>=1.10",
+    "ruff>=0.5",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/healer", "demo_api"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests/unit", "tests/integration"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-exclude = [".specify"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM"]
+
+[tool.mypy]
+strict = true
+files = ["src", "demo_api"]
+
+[tool.ruff.lint.per-file-ignores]
+# Repairs edit literals in place and may lengthen lines.
+"tests/api/*" = ["E501"]

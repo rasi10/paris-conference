@@ -1,0 +1,53 @@
+name: Heal API tests
+
+on:
+  schedule:
+    - cron: "47 5 * * *"
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Demo API mode to run against
+        type: choice
+        options: [v1, v2, broken, v3]
+        default: v2
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: heal
+  cancel-in-progress: false
+
+jobs:
+  heal:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --locked
+      # Demo only: replace this step and API_BASE_URL with your real API.
+      - name: Start the demo API
+        env:
+          MODE: ${{ inputs.mode || 'v2' }}
+        run: |
+          uv run demo-api --mode "$MODE" --port 8000 &
+          for _ in $(seq 50); do
+            curl -sf http://127.0.0.1:8000/openapi.json > /dev/null && break
+            sleep 0.2
+          done
+      - name: Heal
+        env:
+          GH_TOKEN: ${{ github.token }}
+          API_BASE_URL: http://127.0.0.1:8000
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          uv run healer run --publish github
+      - name: Upload run record
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: healer-run
+          path: runs/
