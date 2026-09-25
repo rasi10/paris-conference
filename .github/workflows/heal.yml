@@ -33,6 +33,7 @@ jobs:
           MODE: ${{ inputs.mode || 'v2' }}
         run: |
           uv run demo-api --mode "$MODE" --port 8000 &
+          echo "DEMO_API_PID=$!" >> "$GITHUB_ENV"
           for _ in $(seq 50); do
             curl -sf http://127.0.0.1:8000/openapi.json > /dev/null && break
             sleep 0.2
@@ -45,6 +46,10 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           uv run healer run --publish github
+      - name: Stop the demo API
+        if: always()
+        # A running `uv run` blocks setup-uv's cache cleanup.
+        run: kill "$DEMO_API_PID" 2>/dev/null || true
       - name: Upload run record
         if: always()
         uses: actions/upload-artifact@v4

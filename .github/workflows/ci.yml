@@ -25,7 +25,10 @@ jobs:
         run: uv run pytest
       - name: API suite against the demo API mode matching the baseline
         run: |
+          # Stop the server afterwards: a running `uv run` blocks setup-uv's cache cleanup.
           uv run demo-api --match-baseline api-spec/openapi.json --port 8000 &
+          API_PID=$!
+          trap 'kill "$API_PID"; wait "$API_PID" || true' EXIT
           for _ in $(seq 50); do
             curl -sf http://127.0.0.1:8000/openapi.json > /dev/null && break
             sleep 0.2
