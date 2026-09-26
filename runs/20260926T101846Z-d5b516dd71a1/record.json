@@ -1,0 +1,292 @@
+{
+  "run_id": "20260926T101846Z-d5b516dd71a1",
+  "started_at": "2026-09-26T10:18:46Z",
+  "baseline": {
+    "version": "1.0.0",
+    "hash": "acbbc839a69f",
+    "source": "api-spec/openapi.json"
+  },
+  "finished_at": "2026-09-26T10:18:47Z",
+  "current": {
+    "version": "2.0.0",
+    "hash": "d5b516dd71a1",
+    "source": "http://127.0.0.1:8000/openapi.json"
+  },
+  "changes": [
+    {
+      "id": "C1",
+      "kind": "path_renamed",
+      "method": null,
+      "path": "/health",
+      "field": null,
+      "old": "/health",
+      "new": "/healthz",
+      "required": false,
+      "example": null,
+      "breaking": true
+    },
+    {
+      "id": "C2",
+      "kind": "response_field_added",
+      "method": "GET",
+      "path": "/users",
+      "field": "active",
+      "old": null,
+      "new": "active",
+      "required": true,
+      "example": null,
+      "breaking": false
+    },
+    {
+      "id": "C3",
+      "kind": "response_field_renamed",
+      "method": "GET",
+      "path": "/users",
+      "field": "name",
+      "old": "name",
+      "new": "full_name",
+      "required": false,
+      "example": null,
+      "breaking": true
+    },
+    {
+      "id": "C4",
+      "kind": "request_field_added",
+      "method": "POST",
+      "path": "/users",
+      "field": "role",
+      "old": null,
+      "new": "role",
+      "required": true,
+      "example": "member",
+      "breaking": true
+    },
+    {
+      "id": "C5",
+      "kind": "request_field_renamed",
+      "method": "POST",
+      "path": "/users",
+      "field": "name",
+      "old": "name",
+      "new": "full_name",
+      "required": false,
+      "example": null,
+      "breaking": true
+    },
+    {
+      "id": "C6",
+      "kind": "response_field_added",
+      "method": "POST",
+      "path": "/users",
+      "field": "active",
+      "old": null,
+      "new": "active",
+      "required": true,
+      "example": null,
+      "breaking": false
+    },
+    {
+      "id": "C7",
+      "kind": "response_field_renamed",
+      "method": "POST",
+      "path": "/users",
+      "field": "name",
+      "old": "name",
+      "new": "full_name",
+      "required": false,
+      "example": null,
+      "breaking": true
+    },
+    {
+      "id": "C8",
+      "kind": "status_changed",
+      "method": "POST",
+      "path": "/users",
+      "field": null,
+      "old": 200,
+      "new": 201,
+      "required": false,
+      "example": null,
+      "breaking": true
+    },
+    {
+      "id": "C9",
+      "kind": "response_field_added",
+      "method": "GET",
+      "path": "/users/{user_id}",
+      "field": "active",
+      "old": null,
+      "new": "active",
+      "required": true,
+      "example": null,
+      "breaking": false
+    },
+    {
+      "id": "C10",
+      "kind": "response_field_renamed",
+      "method": "GET",
+      "path": "/users/{user_id}",
+      "field": "name",
+      "old": "name",
+      "new": "full_name",
+      "required": false,
+      "example": null,
+      "breaking": true
+    }
+  ],
+  "initial_results": [
+    {
+      "nodeid": "test_health.py::test_health",
+      "file": "test_health.py",
+      "name": "test_health",
+      "outcome": "failed",
+      "message": "assert 404 == 200\n +  where 404 = <Response [404 Not Found]>.status_code"
+    },
+    {
+      "nodeid": "test_users.py::test_create_user",
+      "file": "test_users.py",
+      "name": "test_create_user",
+      "outcome": "failed",
+      "message": "assert 422 == 200\n +  where 422 = <Response [422 Unprocessable Entity]>.status_code"
+    },
+    {
+      "nodeid": "test_users.py::test_get_missing_user",
+      "file": "test_users.py",
+      "name": "test_get_missing_user",
+      "outcome": "passed",
+      "message": ""
+    },
+    {
+      "nodeid": "test_users.py::test_get_user",
+      "file": "test_users.py",
+      "name": "test_get_user",
+      "outcome": "failed",
+      "message": "KeyError: 'name'"
+    },
+    {
+      "nodeid": "test_users.py::test_list_users",
+      "file": "test_users.py",
+      "name": "test_list_users",
+      "outcome": "failed",
+      "message": "KeyError: 'name'"
+    }
+  ],
+  "classification": "spec_change",
+  "attempts": [
+    {
+      "number": 1,
+      "repairs": [
+        {
+          "change_id": "C1",
+          "file": "test_health.py",
+          "line": 5,
+          "test": "test_health",
+          "before": "response = client.get(\"/health\")",
+          "after": "response = client.get(\"/healthz\")",
+          "description": "Path `/health` renamed to `/healthz`"
+        },
+        {
+          "change_id": "C3",
+          "file": "test_users.py",
+          "line": 9,
+          "test": "test_list_users",
+          "before": "assert users[0][\"name\"] == \"Ada Lovelace\"",
+          "after": "assert users[0][\"full_name\"] == \"Ada Lovelace\"",
+          "description": "`GET /users` response field `name` renamed to `full_name`"
+        },
+        {
+          "change_id": "C10",
+          "file": "test_users.py",
+          "line": 18,
+          "test": "test_get_user",
+          "before": "assert body[\"name\"] == \"Grace Hopper\"",
+          "after": "assert body[\"full_name\"] == \"Grace Hopper\"",
+          "description": "`GET /users/{user_id}` response field `name` renamed to `full_name`"
+        },
+        {
+          "change_id": "C5",
+          "file": "test_users.py",
+          "line": 28,
+          "test": "test_create_user",
+          "before": "response = client.post(\"/users\", json={\"name\": \"Alan Turing\", \"email\": \"alan@example.com\"})",
+          "after": "response = client.post(\"/users\", json={\"full_name\": \"Alan Turing\", \"email\": \"alan@example.com\", \"role\": \"member\"})",
+          "description": "`POST /users` request field `name` renamed to `full_name`"
+        },
+        {
+          "change_id": "C4",
+          "file": "test_users.py",
+          "line": 28,
+          "test": "test_create_user",
+          "before": "response = client.post(\"/users\", json={\"name\": \"Alan Turing\", \"email\": \"alan@example.com\"})",
+          "after": "response = client.post(\"/users\", json={\"full_name\": \"Alan Turing\", \"email\": \"alan@example.com\", \"role\": \"member\"})",
+          "description": "`POST /users` request required field `role` added"
+        },
+        {
+          "change_id": "C8",
+          "file": "test_users.py",
+          "line": 29,
+          "test": "test_create_user",
+          "before": "assert response.status_code == 200",
+          "after": "assert response.status_code == 201",
+          "description": "`POST /users` success status changed from 200 to 201"
+        },
+        {
+          "change_id": "C7",
+          "file": "test_users.py",
+          "line": 31,
+          "test": "test_create_user",
+          "before": "assert body[\"name\"] == \"Alan Turing\"",
+          "after": "assert body[\"full_name\"] == \"Alan Turing\"",
+          "description": "`POST /users` response field `name` renamed to `full_name`"
+        }
+      ],
+      "guard_violations": [],
+      "results": [
+        {
+          "nodeid": "test_health.py::test_health",
+          "file": "test_health.py",
+          "name": "test_health",
+          "outcome": "passed",
+          "message": ""
+        },
+        {
+          "nodeid": "test_users.py::test_create_user",
+          "file": "test_users.py",
+          "name": "test_create_user",
+          "outcome": "passed",
+          "message": ""
+        },
+        {
+          "nodeid": "test_users.py::test_get_missing_user",
+          "file": "test_users.py",
+          "name": "test_get_missing_user",
+          "outcome": "passed",
+          "message": ""
+        },
+        {
+          "nodeid": "test_users.py::test_get_user",
+          "file": "test_users.py",
+          "name": "test_get_user",
+          "outcome": "passed",
+          "message": ""
+        },
+        {
+          "nodeid": "test_users.py::test_list_users",
+          "file": "test_users.py",
+          "name": "test_list_users",
+          "outcome": "passed",
+          "message": ""
+        }
+      ],
+      "passed": true
+    }
+  ],
+  "actions": [
+    "Repaired 7 line(s) in 2 test file(s) and updated the baseline to version 2.0.0; the suite passes on re-run"
+  ],
+  "outcome": "repaired",
+  "exit_code": 0,
+  "notes": [
+    "4 failing test(s), all calling endpoints touched by 10 detected specification change(s)"
+  ]
+}
