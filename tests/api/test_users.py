@@ -6,7 +6,7 @@ def test_list_users(client: httpx.Client) -> None:
     assert response.status_code == 200
     users = response.json()
     assert users[0]["id"] == 1
-    assert users[0]["name"] == "Ada Lovelace"
+    assert users[0]["full_name"] == "Ada Lovelace"
     assert users[0]["email"] == "ada@example.com"
 
 
@@ -15,7 +15,7 @@ def test_get_user(client: httpx.Client) -> None:
     assert response.status_code == 200
     body = response.json()
     assert body["id"] == 2
-    assert body["name"] == "Grace Hopper"
+    assert body["full_name"] == "Grace Hopper"
     assert body["email"] == "grace@example.com"
 
 
@@ -25,9 +25,9 @@ def test_get_missing_user(client: httpx.Client) -> None:
 
 
 def test_create_user(client: httpx.Client) -> None:
-    response = client.post("/users", json={"name": "Alan Turing", "email": "alan@example.com"})
-    assert response.status_code == 200
+    response = client.post("/users", json={"full_name": "Alan Turing", "email": "alan@example.com", "role": "member"})
+    assert response.status_code == 201
     body = response.json()
-    assert body["name"] == "Alan Turing"
+    assert body["full_name"] == "Alan Turing"
     assert body["email"] == "alan@example.com"
     assert body["id"] > 2
